@@ -9,42 +9,40 @@ const { verify, verifyFactory } = require("./utils/verify");
 require("dotenv/config");
 
 async function main() {
-  /// -------------- PaytuskerFactory Deploying... -------------------
-  const Factory = await hre.ethers.getContractFactory("PaytuskerFactory");
+  /// -------------- PayFactory Deploying... -------------------
+  const Factory = await hre.ethers.getContractFactory("PayFactory");
   const factory = await Factory.deploy(process.env.FEE_SETTER_ADDRESS);
 
   await factory.deployed();
   await factory.deployTransaction.wait(3);
 
-  console.log("PaytuskerFactory deployed address", factory.address);
+  console.log("PayFactory deployed address", factory.address);
 
-  /// -------------- PaytuskerPair Deploying... -------------------
-  const Pair = await hre.ethers.getContractFactory("PaytuskerPair");
+  /// -------------- PayPair Deploying... -------------------
+  const Pair = await hre.ethers.getContractFactory("PayPair");
   const pair = await Pair.deploy();
 
   await pair.deployed();
   await pair.deployTransaction.wait(3);
 
-  console.log("PaytuskerPair deployed address", pair.address);
+  console.log("PayPair deployed address", pair.address);
 
-  /// -------------- PaytuskerERC20 Deploying... -------------------
-  const Token = await hre.ethers.getContractFactory("PaytuskerERC20");
+  /// -------------- PayERC20 Deploying... -------------------
+  const Token = await hre.ethers.getContractFactory("PayERC20");
   const token = await Token.deploy();
 
   await token.deployed();
   await token.deployTransaction.wait(3);
 
-  console.log("PaytuskerERC20 deployed address", token.address);
+  console.log("PayERC20 deployed address", token.address);
 
-  console.log(
-    "------------------ verify PaytuskerFactory --------------------"
-  );
+  console.log("------------------ verify PayFactory --------------------");
   await verifyFactory(factory.address);
 
-  console.log("------------------ verify PaytuskerPair --------------------");
+  console.log("------------------ verify PayPair --------------------");
   await verify(pair.address);
 
-  console.log("------------------ verify PaytuskerERC20 --------------------");
+  console.log("------------------ verify PayERC20 --------------------");
 
   await verify(token.address);
 }

@@ -1,13 +1,13 @@
 pragma solidity =0.5.16;
 
-import './interfaces/IPaytuskerERC20.sol';
-import './libraries/SafeMath.sol';
+import "./interfaces/IPayERC20.sol";
+import "./libraries/SafeMath.sol";
 
-contract PaytuskerERC20 is IPaytuskerERC20 {
+contract PayERC20 is IPayERC20 {
     using SafeMath for uint256;
 
-    string public constant name = 'Paytusker LPs';
-    string public constant symbol = 'PTT-LP';
+    string public constant name = "Pay LPs";
+    string public constant symbol = "PTT-LP";
     uint8 public constant decimals = 18;
     uint256 public totalSupply;
     mapping(address => uint256) public balanceOf;
@@ -15,10 +15,15 @@ contract PaytuskerERC20 is IPaytuskerERC20 {
 
     bytes32 public DOMAIN_SEPARATOR;
     // keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
-    bytes32 public constant PERMIT_TYPEHASH = 0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9;
+    bytes32 public constant PERMIT_TYPEHASH =
+        0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9;
     mapping(address => uint256) public nonces;
 
-    event Approval(address indexed owner, address indexed spender, uint256 value);
+    event Approval(
+        address indexed owner,
+        address indexed spender,
+        uint256 value
+    );
     event Transfer(address indexed from, address indexed to, uint256 value);
 
     constructor() public {
@@ -28,9 +33,11 @@ contract PaytuskerERC20 is IPaytuskerERC20 {
         }
         DOMAIN_SEPARATOR = keccak256(
             abi.encode(
-                keccak256('EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)'),
+                keccak256(
+                    "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
+                ),
                 keccak256(bytes(name)),
-                keccak256(bytes('1')),
+                keccak256(bytes("1")),
                 chainId,
                 address(this)
             )
@@ -84,7 +91,9 @@ contract PaytuskerERC20 is IPaytuskerERC20 {
         uint256 value
     ) external returns (bool) {
         if (allowance[from][msg.sender] != uint256(-1)) {
-            allowance[from][msg.sender] = allowance[from][msg.sender].sub(value);
+            allowance[from][msg.sender] = allowance[from][msg.sender].sub(
+                value
+            );
         }
         _transfer(from, to, value);
         return true;
@@ -99,16 +108,28 @@ contract PaytuskerERC20 is IPaytuskerERC20 {
         bytes32 r,
         bytes32 s
     ) external {
-        require(deadline >= block.timestamp, 'Paytusker: EXPIRED');
+        require(deadline >= block.timestamp, "Pay: EXPIRED");
         bytes32 digest = keccak256(
             abi.encodePacked(
-                '\x19\x01',
+                "\x19\x01",
                 DOMAIN_SEPARATOR,
-                keccak256(abi.encode(PERMIT_TYPEHASH, owner, spender, value, nonces[owner]++, deadline))
+                keccak256(
+                    abi.encode(
+                        PERMIT_TYPEHASH,
+                        owner,
+                        spender,
+                        value,
+                        nonces[owner]++,
+                        deadline
+                    )
+                )
             )
         );
         address recoveredAddress = ecrecover(digest, v, r, s);
-        require(recoveredAddress != address(0) && recoveredAddress == owner, 'Paytusker: INVALID_SIGNATURE');
+        require(
+            recoveredAddress != address(0) && recoveredAddress == owner,
+            "Pay: INVALID_SIGNATURE"
+        );
         _approve(owner, spender, value);
     }
 }
